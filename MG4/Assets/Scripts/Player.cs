@@ -27,6 +27,9 @@ public class Player : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        // Ignore scenery and don't replace an unanswered question with another.
+        if (_currentFood != null || !(other.CompareTag("Add") ||
+            other.CompareTag("Subtract") || other.CompareTag("Multiply"))) return;
         string operatorCharacter = "";
         if (other.gameObject.tag.Equals("Add"))
         {
@@ -53,6 +56,8 @@ public class Player : MonoBehaviour
 
         _equationObject.SetActive(true);
         _movement.enabled = false;
+        _equationInputField.text = "";
+        _equationInputField.ActivateInputField();
 
         // STEP 6 -------------------------------------------------------------
         // Inside this method, we've detected a collision with fish food.
@@ -65,11 +70,13 @@ public class Player : MonoBehaviour
         // Feature 5 of the rubric should work after this.
 
 
+        other.GetComponent<FloatAnimation>().StopAnimation();
         // STEP 6 -------------------------------------------------------------
     }
 
     public void OnPlayerInput()
     {
+        if (_currentFood == null) return;
         Debug.Log("Player wrote: " + _equationInputField.text);
         _equationObject.SetActive(false);
         _movement.enabled = true;
@@ -81,15 +88,15 @@ public class Player : MonoBehaviour
             {
                 case EquationType.Add:
                     // UNCOMMENT AFTER STEP 3
-                    //correct = CheckIfAdditionCorrect(number);
+                    correct = CheckIfAdditionCorrect(number);
                     break;
                 case EquationType.Subtract:
                     // UNCOMMENT AFTER STEP 4
-                    //correct = CheckIfSubtractionCorrect(number);
+                    correct = CheckIfSubtractionCorrect(number);
                     break;
                 case EquationType.Multiply:
                     // UNCOMMENT AFTER STEP 5
-                    //correct = CheckIfMultiplicationCorrect(number);
+                    correct = CheckIfMultiplicationCorrect(number);
                     break;
             }
         }
@@ -109,7 +116,7 @@ public class Player : MonoBehaviour
         }
         else
         {
-            transform.Translate(-transform.forward * _incorrectBackwardsMovement);
+            transform.position -= transform.forward * _incorrectBackwardsMovement;
 
             _incorrectUI.SetActive(true);
         }
@@ -138,7 +145,10 @@ public class Player : MonoBehaviour
     // Feature 4 of the rubric should work after you finish all of the 3 methods
     //      in this file.
 
-    // private ??? CheckIfAdditionCorrect (??? ???)
+    private bool CheckIfAdditionCorrect(int answer)
+    {
+        return _number1 + _number2 == answer;
+    }
 
     // STEP 3 -----------------------------------------------------------------
 
@@ -154,7 +164,10 @@ public class Player : MonoBehaviour
     // After you write this method, uncomment the line above that says
     //      "UNCOMMENT AFTER STEP 4".
 
-    // private ??? CheckIfSubtractionCorrect (??? ???)
+    private bool CheckIfSubtractionCorrect(int answer)
+    {
+        return _number1 - _number2 == answer;
+    }
 
     // STEP 4 -----------------------------------------------------------------
 
@@ -170,7 +183,10 @@ public class Player : MonoBehaviour
     // After you write this method, uncomment the line above that says
     //      "UNCOMMENT AFTER STEP 5".
 
-    // private ??? CheckIfMultiplicationCorrect (??? ???)
+    private bool CheckIfMultiplicationCorrect(int answer)
+    {
+        return _number1 * _number2 == answer;
+    }
 
     // STEP 5 -----------------------------------------------------------------
 
