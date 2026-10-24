@@ -11,9 +11,10 @@ In `FloatAnimation`, `Start()` sets `_timer` to `_switchSpeed`, so the first mov
 - Correct answers give one point and remove that food. Incorrect answers move the fish backward so you can try again. Touched food stops bobbing.
 
 ## Implementation
-The Main scene includes 25 separate trigger spheres: 9 Add, 8 Subtract, and 8 Multiply. A seeded random layout spreads 8 over vehicle roofs, 8 over building roofs, and 9 around street areas. Roof heights come from the actual model bounds, with clearance for the sphere and its floating animation. The layout stays the same on each playthrough so it is easy to test and revisit. The fish has a collider and a Rigidbody with gravity disabled. Each question-checking method returns whether the typed integer equals the operation's result. Only food triggers start questions, and another food cannot replace an unanswered question.
+The Main scene includes 50 separate trigger spheres: 17 Add, 17 Subtract, and 16 Multiply. A seeded random layout spreads 12 over vehicle roofs, 28 over building roofs, and 10 around street areas. Roof heights come from the actual model bounds, with clearance for the sphere and its floating animation. The layout stays the same on each playthrough so it is easy to test and revisit. The fish has a collider and a Rigidbody with gravity disabled. Each question-checking method returns whether the typed integer equals the operation's result. Only food triggers start questions, and another food cannot replace an unanswered question.
 
 ## Open-Source Assets
 - [Quirky animal 3D models](https://assetstore.unity.com/packages/3d/characters/animals/quirky-series-free-animals-pack-178235)
 - [City 3D models](https://assetstore.unity.com/packages/3d/environments/simplepoly-city-low-poly-assets-58899)
 - [Bite sound effect](https://freesound.org/people/Jofae/sounds/353067/)
+

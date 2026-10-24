@@ -48,7 +48,7 @@ public static class AssignmentBuild
             AssetDatabase.CreateAsset(material, materialPath);
         }
         string[] tags = {"Add", "Subtract", "Multiply"};
-        var random = new System.Random(4725);
+        var random = new System.Random(5023);
         var positions = new List<Vector3>();
         var areas = new List<string>();
         var placementLog = new List<string>();
@@ -58,28 +58,29 @@ public static class AssignmentBuild
         {
             var surfaces = all.Where(t => t.name.StartsWith(category) &&
                 t.GetComponentsInChildren<Renderer>().Length > 0)
-                .OrderBy(t => Vector3.Distance(t.position, player.transform.position)).Take(18)
+                .OrderBy(t => Vector3.Distance(t.position, player.transform.position)).Take(40)
                 .OrderBy(t => random.Next()).ToArray();
             Check(surfaces.Length > 0, "Missing placement surfaces: " + category);
+            int targetCount = category == "Building_" ? 28 : 12;
             int placed = 0;
-            for (int attempt = 0; attempt < 200 && placed < 8; attempt++)
+            for (int attempt = 0; attempt < 2000 && placed < targetCount; attempt++)
             {
                 var renderers = surfaces[attempt % surfaces.Length].GetComponentsInChildren<Renderer>();
                 var bounds = renderers[0].bounds;
                 foreach(var renderer in renderers) bounds.Encapsulate(renderer.bounds);
-                Vector3 p = new Vector3(bounds.center.x + (float)(random.NextDouble()-.5)*bounds.size.x*.35f,
-                    bounds.max.y+1.05f, bounds.center.z+(float)(random.NextDouble()-.5)*bounds.size.z*.35f);
-                if(positions.Any(other => Vector3.Distance(other,p)<2f)) continue;
+                Vector3 p = new Vector3(bounds.center.x + (float)(random.NextDouble()-.5)*bounds.size.x*.65f,
+                    bounds.max.y+1.05f, bounds.center.z+(float)(random.NextDouble()-.5)*bounds.size.z*.65f);
+                if(positions.Any(other => Vector3.Distance(other,p)<3f)) continue;
                 positions.Add(p); areas.Add(category == "Vehicle_" ? "CarRoof" : "BuildingRoof"); placed++;
             }
-            Check(placed == 8, "Not enough separated roof positions: " + category);
+            Check(placed == targetCount, "Not enough separated roof positions: " + category);
         }
-        // Keep an easy first pickup, then spread nine street pickups over the neighborhood.
+        // Keep an easy first pickup, then spread ten street pickups over the neighborhood.
         positions.Add(player.transform.position + player.transform.forward*3f); areas.Add("Street");
         var roads = all.Where(t => t.name.StartsWith("Road") && t.GetComponentsInChildren<Renderer>().Length>0)
-            .OrderBy(t=>Vector3.Distance(t.position,player.transform.position)).Take(24).ToArray();
+            .OrderBy(t=>Vector3.Distance(t.position,player.transform.position)).Take(60).ToArray();
         Check(roads.Length>0,"No road surfaces found");
-        for(int attempt=0; positions.Count<25 && attempt<1000; attempt++)
+        for(int attempt=0; positions.Count<50 && attempt<1000; attempt++)
         {
             var bounds=roads[random.Next(roads.Length)].GetComponentsInChildren<Renderer>()[0].bounds;
             var p=new Vector3(bounds.center.x+(float)(random.NextDouble()-.5)*bounds.size.x*.7f,
@@ -90,8 +91,8 @@ public static class AssignmentBuild
             if(Vector3.Distance(p,player.transform.position)<2f || Physics.CheckSphere(p,.85f,~0,QueryTriggerInteraction.Ignore)) continue;
             positions.Add(p); areas.Add("Street");
         }
-        Check(positions.Count==25,"Expected exactly 25 separated pickups");
-        for(int i=0;i<25;i++)
+        Check(positions.Count==50,"Expected exactly 50 separated pickups");
+        for(int i=0;i<50;i++)
         {
             var food = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             food.name = "Food_" + (i+1).ToString("00") + "_" + areas[i] + "_" + tags[i%3]; food.tag = tags[i%3];
@@ -110,8 +111,8 @@ public static class AssignmentBuild
         var output = Path.GetFullPath(Path.Combine(Application.dataPath, "../../../../outputs"));
         Directory.CreateDirectory(output);
         File.WriteAllLines(Path.Combine(output,"MG4-food-layout.txt"),placementLog);
-        File.WriteAllText(Path.Combine(output, "MG4-validation.txt"), "PASS: all 300 operand/operator cases accept the correct answer and reject an incorrect answer (600 assertions).\nPASS: all 8 serialized Player references assigned.\nPASS: all three independent food objects have correct tags, trigger colliders, FloatAnimation and no Rigidbody.\nPASS: player has no-gravity Rigidbody and collider.\nBrowser gameplay checks are recorded separately.\n");
-        File.AppendAllText(Path.Combine(output,"MG4-validation.txt"),"PASS: 25 pickups, including 8 car roofs, 8 building roofs and 9 street positions; all have trigger colliders and FloatAnimation.\n");
+        File.WriteAllText(Path.Combine(output, "MG4-validation.txt"), "PASS: all 300 operand/operator cases accept the correct answer and reject an incorrect answer (600 assertions).\nPASS: all 8 serialized Player references assigned.\nPASS: all 50 independent food objects have correct tags, trigger colliders, FloatAnimation and no Rigidbody.\nPASS: player has no-gravity Rigidbody and collider.\nBrowser gameplay checks are recorded separately.\n");
+        File.AppendAllText(Path.Combine(output,"MG4-validation.txt"),"PASS: 50 pickups, including 12 car roofs, 28 building roofs and 10 street positions; all have trigger colliders and FloatAnimation.\n");
         PlayerSettings.WebGL.compressionFormat = WebGLCompressionFormat.Disabled;
         PlayerSettings.runInBackground = true;
         PlayerSettings.productName = "Bright - Math Fish";
@@ -124,3 +125,4 @@ public static class AssignmentBuild
         Debug.Log("MG4 BUILD AND CHECKS SUCCEEDED");
     }
 }
+
